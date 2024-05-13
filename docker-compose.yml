@@ -73,6 +73,8 @@ services:
     build: ./payments-ms
     volumes:
       - ./payments-ms/src:/usr/src/app/src
+    ports:
+      - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
     command: npm run start:dev
     environment:
       - PORT=${PAYMENTS_MS_PORT}
