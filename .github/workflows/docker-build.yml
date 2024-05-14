@@ -1,0 +1,26 @@
+name: Docker image build and push to Docker Hub
+
+on:
+  workflow_call:
+    inputs:
+      app-name:
+        required: true
+        type: string
+        description: "The names of the app to build and push to Docker Hub"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+      - name: Build docker image
+        run: docker build -f Dockerfile.prod -t ${{secrets.DOCKER_USERNAME}}/${{inputs.app-name}}:latest ${{inputs.app-name}}/.
+      - name: Publish image to docker hub
+        run: docker push ${{secrets.DOCKER_USERNAME}}/${{inputs.app-name}}:latest
