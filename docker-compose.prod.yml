@@ -5,19 +5,17 @@ services:
   # ====================
   nats-server:
     image: nats:latest
-    ports:
-      - "8222:8222"
 
   # ====================
   #  Gateway
   # ====================
   client-gateway:
-    build: ./client-gateway
+    build:
+      context: ./client-gateway
+      dockerfile: Dockerfile.prod
+    image: client-gateway-prod
     ports:
       - ${CLIENT_GATEWAY_PORT}:3000
-    volumes:
-      - ./client-gateway/src:/usr/src/app/src
-    command: npm run start:dev
     environment:
       - PORT=3000
       - NATS_URL=${NATS_URL}
@@ -26,10 +24,10 @@ services:
   # Products Microservice
   # ====================
   products-ms:
-    build: ./products-ms
-    volumes:
-      - ./products-ms/src:/usr/src/app/src
-    command: npm run start:dev
+    build:
+      context: ./products-ms
+      dockerfile: Dockerfile.prod
+    image: products-ms-prod
     environment:
       - PORT=${PRODUCTS_MS_PORT}
       - NATS_URL=${NATS_URL}
@@ -39,43 +37,27 @@ services:
   # Orders Microservice
   # ====================
   orders-ms:
-    depends_on:
-      - orders-db
-    build: ./orders-ms
-    volumes:
-      - ./orders-ms/src:/usr/src/app/src
-    command: npm run start:dev
+    build:
+      context: ./orders-ms
+      dockerfile: Dockerfile.prod
+      args:
+        DATABASE_URL: ${DATABASE_URL_POSTGRES_ORDERS_MS}
+    image: orders-ms-prod
     environment:
       - PORT=${ORDERS_MS_PORT}
       - NATS_URL=${NATS_URL}
       - DATABASE_URL=${DATABASE_URL_POSTGRES_ORDERS_MS}
 
   # ====================
-  # Orders Database
-  # ====================
-  orders-db:
-    container_name: orders-database
-    image: postgres:16.2
-    restart: always
-    volumes:
-      - ./orders-ms/postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-
-  # ====================
   # Payments Microservice
   # ====================
   payments-ms:
-    build: ./payments-ms
-    volumes:
-      - ./payments-ms/src:/usr/src/app/src
+    build:
+      context: ./payments-ms
+      dockerfile: Dockerfile.prod
+    image: payments-ms-prod
     ports:
       - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
-    command: npm run start:dev
     environment:
       - PORT=${PAYMENTS_MS_PORT}
       - NATS_URL=${NATS_URL}
@@ -88,10 +70,10 @@ services:
   # Auth Microservice
   # ====================
   auth-ms:
-    build: ./auth-ms
-    volumes:
-      - ./auth-ms/src:/usr/src/app/src
-    command: npm run start:dev
+    build:
+      context: ./auth-ms
+      dockerfile: Dockerfile.prod
+    image: auth-ms-prod
     environment:
       - PORT=${AUTH_MS_PORT}
       - NATS_URL=${NATS_URL}
