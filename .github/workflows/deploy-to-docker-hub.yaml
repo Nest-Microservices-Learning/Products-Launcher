@@ -30,7 +30,7 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          apps=("auth-ms" "client-gateway" "product-ms" "orders-ms" "payments-ms")
+          apps=("auth-ms" "client-gateway" "products-ms" "orders-ms" "payments-ms")
           for app in "${apps[@]}"; do
             echo "Building and pushing $app"
             cd $app
