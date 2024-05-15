@@ -14,9 +14,24 @@ jobs:
           access_token: ${{ github.token }}
 
   generate_docker_image:
-    uses: ./.github/workflows/docker-build.yml
-    with:
-      app-name: ${{ matrix.app-name }}
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         app-name: [auth-ms, client-gateway, product-ms, orders-ms, payments-ms]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Call Docker build and push workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { context, github } = require('@actions/github');
+            await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'docker-build.yml',
+              ref: context.ref,
+              inputs: {
+                'app-name': '${{ matrix.app-name }}'
+              }
+            });
