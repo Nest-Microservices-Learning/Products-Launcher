@@ -6,28 +6,14 @@ on:
 
 jobs:
   generate_docker_image:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         app-name: [auth-ms, client-gateway, product-ms, orders-ms, payments-ms]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Call Docker build and push workflow
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { context, getOctokit } = require('@actions/github');
-            const octokit = getOctokit(process.env.GITHUB_TOKEN);
-            await octokit.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'docker-build.yml',
-              ref: context.ref,
-              inputs: {
-                'app-name': '${{ matrix.app-name }}'
-              }
-            });
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

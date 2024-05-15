@@ -1,12 +1,20 @@
 name: Docker image build and push to Docker Hub
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       app-name:
         required: true
         type: string
         description: "The names of the app to build and push to Docker Hub"
+      docker-username:
+        required: true
+        type: string
+        description: "Docker Hub username"
+      docker-password:
+        required: true
+        type: string
+        description: "Docker Hub password"
 
 jobs:
   build:
@@ -20,11 +28,10 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ github.event.inputs.docker-username }}
+          password: ${{ github.event.inputs.docker-password }}
 
       - name: Build and push Docker image
         run: |
-          docker build -f Dockerfile.prod -t ${{ secrets.DOCKER_USERNAME }}/${{ github.event.inputs['app-name'] }}:latest ${{ github.event.inputs['app-name'] }}/.
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ github.event.inputs['app-name'] }}:latest
-
+          docker build -f Dockerfile.prod -t ${{ github.event.inputs.docker-username }}/${{ github.event.inputs.app-name }}:latest ${{ github.event.inputs.app-name }}/.
+          docker push ${{ github.event.inputs.docker-username }}/${{ github.event.inputs.app-name }}:latest
