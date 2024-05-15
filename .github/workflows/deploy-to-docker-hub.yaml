@@ -31,8 +31,8 @@ jobs:
           apps=("auth-ms" "client-gateway" "product-ms" "orders-ms" "payments-ms")
           for app in "${apps[@]}"; do
             echo "Building and pushing $app"
-            ls $app
-            pwd
-            docker build -f $app/Dockerfile.prod -t ${{ secrets.DOCKER_USERNAME }}/$app:latest $app/.
+            cd $app
+            docker build -f Dockerfile.prod -t ${{ secrets.DOCKER_USERNAME }}/$app:latest .
             docker push ${{ secrets.DOCKER_USERNAME }}/$app:latest
+            cd ..
           done
