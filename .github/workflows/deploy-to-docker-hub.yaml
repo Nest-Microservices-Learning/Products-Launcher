@@ -1,18 +1,10 @@
-name: Build images
+name: Dispatch Docker Builds
 
 on:
   push:
     branches: [main]
 
 jobs:
-  avoid_reduncy:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Cancel Previous Redundant Builds
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          access_token: ${{ github.token }}
-
   generate_docker_image:
     runs-on: ubuntu-22.04
     strategy:
@@ -21,8 +13,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Call Docker build and push workflow
-        uses: actions/github-script@v7.0.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { context, getOctokit } = require('@actions/github');
@@ -36,3 +29,5 @@ jobs:
                 'app-name': '${{ matrix.app-name }}'
               }
             });
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
