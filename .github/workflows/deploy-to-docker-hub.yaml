@@ -34,7 +34,7 @@ jobs:
           for app in "${apps[@]}"; do
             echo "Building and pushing $app"
             cd $app
-            docker build -f Dockerfile.prod -t ${{ secrets.DOCKER_USERNAME }}/$app:latest .
+            docker build -f Dockerfile.prod --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} -t ${{ secrets.DOCKER_USERNAME }}/$app:latest .
             docker push ${{ secrets.DOCKER_USERNAME }}/$app:latest
             cd ..
           done
