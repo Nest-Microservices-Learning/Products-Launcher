@@ -1,7 +1,7 @@
 name: Docker image build and push to Docker Hub
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       app-name:
         required: true
@@ -11,9 +11,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        app-name: ${{fromJson(needs.generate_docker_image.outputs.json)}}
     steps:
       - uses: actions/checkout@v4
       - name: Docker Setup Buildx
